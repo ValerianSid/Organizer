@@ -59,33 +59,4 @@ public class UserService {
         return dtoList;
     }
 
-    public List<Friend> getFriendByUserId(long userId) {
-        User tmpUser;
-        if(!userRepository.exists(Example.of((tmpUser = userRepository.getById(userId))))){
-            throw new UserAlreadyExistsException("Такого пользователя не существует");
-        }
-        return tmpUser.getFriendList();
-    }
-
-    public Map<User, Contacts> getUserContacts() {
-        List<User> list = userRepository.findAll();
-        Map<User,Contacts> map = new HashMap<>();
-        for (User user : list) {
-            map.put(user,user.getContacts());
-        }
-        return map;
-    }
-
-    public Map<Friend,Contacts> getFriendContactsByUserId(long userId) {
-        User user;
-        Map<Friend,Contacts> map = new HashMap<>();
-        if(!userRepository.exists(Example.of((user = userRepository.getById(userId))))){
-            throw new UserAlreadyExistsException("Такого пользователя не существует");
-        }
-        List<Friend> list = user.getFriendList();
-        for (Friend friend: list) {
-            map.put(friend,friend.getContacts()) ;
-        }
-        return map;
-    }
 }
