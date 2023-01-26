@@ -117,4 +117,26 @@ public class TransactionService {
 
     }
 
+    @Transactional
+    public BillDto fillAccount(BillDto billDto) {
+        return accountRepository.findById(billDto.getId()).map(account -> {
+            if (account.getCurrency() == billDto.getCurrency()) {
+                account.setAmmount(account.getAmmount() + billDto.getAmount());
+                accountRepository.save(account);
+                createTransaction(new CreateTxRequestDto(null, account.getId(), account.getAmmount(),
+                        true), null, null, account);
+                return new BillDto(account.getName(), account.getId(), billDto.getCurrency(), LocalDateTime.now(),
+                        account.getAmmount());
+            } else {
+                account.setAmmount(exchengeService.exchange(billDto.getAmount(), billDto.getCurrency(),
+                        account.getCurrency()));
+                createTransaction(new CreateTxRequestDto(null, account.getId(), account.getAmmount(),
+                        true), null, null, account);
+                return new BillDto(account.getName(), account.getId(), billDto.getCurrency(), LocalDateTime.now(),
+                        account.getAmmount());
+            }
+
+        }).orElse(null);
+    }
+
 }
